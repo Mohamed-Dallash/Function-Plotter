@@ -5,7 +5,9 @@ class ExpressionGenerator:
     def generateExpression(self, function):
         tokenizer = Tokenizer()
         tokens,types = tokenizer.tokenize(input_expression=function)
+        temp_tokens = tokens.copy()
         expression = ""
+        temp_expression = expression
         state = "start"
         states=[]
         states.append(state)
@@ -29,7 +31,7 @@ class ExpressionGenerator:
                     if tokens[i]=='^':
                         tokens[i]="**"
                 else:
-                    raise FunctionPlotterException(type="Syntax Error", message=f"Near the end of {expression}\nExpected an operator between {tokens[i-1]} and {tokens[i]}")
+                    raise FunctionPlotterException(type="Syntax Error", message=f"Near the end of {temp_expression}\nExpected an operator between {temp_tokens[i-1]} and {temp_tokens[i]}")
                     
             elif state == "incomplete expression":
                 if types[i] == "negative":
@@ -37,10 +39,11 @@ class ExpressionGenerator:
                 elif types[i] == "var" or types[i]=="number":
                     state = "complete expression"
                 else:
-                    raise FunctionPlotterException(type="Syntax Error", message=f"Near the end of {expression}\nExpected a number or variable between {tokens[i-1]} and {tokens[i]}")
+                    raise FunctionPlotterException(type="Syntax Error", message=f"Near the end of {temp_expression}\nExpected a number or variable between {temp_tokens[i-1]} and {temp_tokens[i]}")
             
             expression+=tokens[i]
+            temp_expression+=temp_tokens[i]
             i += 1
         if state != "complete expression":
-            raise FunctionPlotterException(type="Syntax Error", message=f"Near the end of {expression}\nExpected a number or variable after {tokens[i-1]}")
+            raise FunctionPlotterException(type="Syntax Error", message=f"Near the end of {temp_expression}\nExpected a number or variable after {temp_tokens[i-1]}")
         return expression
